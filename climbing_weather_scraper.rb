@@ -4,11 +4,9 @@ require 'JSON'
 require 'pry'
 
 # this app scrapes the Mountain Project links
-# from the climbingweather.com area pages 
+# from the climbingweather.com area pages
 
-homepage = "http://www.climbingweather.com"
-
-areas_page = HTTParty.get(homepage + "/forecast-by-state")
+areas_page = HTTParty.get("http://www.climbingweather.com/forecast-by-state")
 
 parse_page = Nokogiri::HTML(areas_page)
 
@@ -45,7 +43,7 @@ areas.each { |a| area_hash[a.content] = {path: a['href'], mp: nil} }
 area_hash.each do |area, urls|
   puts "checking #{area} page"
   # for each iteration through our areas hash we set the doc to the area page
-  current_page = HTTParty.get(homepage + urls[:path])
+  current_page = HTTParty.get("http://www.climbingweather.com" + urls[:path])
   doc = Nokogiri::HTML(current_page)
   # grab all links with the rightBoxContent class
   links = doc.css('div.rightBoxContent a')
@@ -56,9 +54,5 @@ area_hash.each do |area, urls|
   # set mp url path in area_hash for current area
   urls[:mp] = mp_url
 end
-
-# area_hash.each do |area, links|
-#   puts "#{area}:#{links[:mp]}"
-# end
 
 Pry.start(binding)
