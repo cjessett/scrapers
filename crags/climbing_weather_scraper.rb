@@ -2,6 +2,7 @@ require 'httparty'
 require 'nokogiri'
 require 'json'
 require 'pry'
+require 'open-uri'
 
 # this app scrapes the Mountain Project links
 # from the climbingweather.com area pages
@@ -59,13 +60,15 @@ end
 # scrape gps coords from mp pages
 area_hash.each do |area, urls|
   puts "finding #{area} coords"
+  next if urls[:mp] == "none found"
   # grab html
   current_page = HTTParty.get(urls[:mp])
   doc = Nokogiri::HTML(current_page)
   # grab location content
-  location = doc.css('div.rspCol tr[3] td[2]').text
+  location = doc.css('div.rspCol tr[2] td[2]').text
   # find index of string after coords
-  i = location.index("V") - 1
+  next if location == nil
+  location.index("V") ? i = location.index("V") - 1 : next
   # slice excess string to get just coords
   location.slice!(i..-1)
   # throw coords string into hash
